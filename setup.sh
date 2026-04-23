@@ -190,6 +190,10 @@ ok "All prerequisites found ($DC)"
 if [ -f ".env.example" ] && [ -f "docker-compose.yml" ] && [ -f "Caddyfile" ]; then
     info "Already inside passkey-proxy directory — skipping clone."
 else
+    case "$0" in
+        /*) EXTERNAL_SCRIPT="$0" ;;
+        *)  EXTERNAL_SCRIPT="$PWD/$0" ;;
+    esac
     TARGET="passkey-proxy"
     if [ -d "$TARGET" ]; then
         info "Directory '$TARGET' already exists — entering it."
@@ -374,3 +378,9 @@ else
 fi
 echo "══════════════════════════════════════════════════════"
 echo ""
+
+# ── 14. cleanup: remove the external bootstrap copy ─────────────────
+
+if [ -n "${EXTERNAL_SCRIPT:-}" ] && [ -f "$EXTERNAL_SCRIPT" ]; then
+    rm -f "$EXTERNAL_SCRIPT" && info "Removed bootstrap copy ($EXTERNAL_SCRIPT)"
+fi
